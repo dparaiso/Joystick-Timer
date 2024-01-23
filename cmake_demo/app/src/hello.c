@@ -3,13 +3,10 @@
 
 #include <stdio.h>
 #include <stdbool.h>
-#include "timer.h"
-#include "hal/button.h"
+#include "commands.h"
+#include "hal/joystick.h"
 
-#define LEFT "config-pin p8.18 gpio"
-#define RIGHT "config-pin p8.15 gpio"
-#define UP "config-pin p8.14 gpio"
-#define DOWN "config-pin p8.17 gpio"
+
 
 enum direction {left = 1, right = 2, up = 3, down = 4, neutral = 0};
 
@@ -25,6 +22,10 @@ int main()
     runCommand(RIGHT);
     runCommand(UP);
     runCommand(DOWN);
+    while(true){
+        printf("%d\n", responseLeftRight());
+
+    }
 
     // readFromFileToScreen()
 
