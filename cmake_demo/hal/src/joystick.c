@@ -9,8 +9,8 @@
 int readFromFileToScreen(char *fileName){
     FILE *pFile = fopen(fileName, "r");
     if (pFile == NULL) {
-    printf("ERROR: Unable to open file (%s) for read\n", fileName);
-    exit(-1);
+        printf("ERROR: Unable to open file (%s) for read\n", fileName);
+        exit(-1);
     }
     // Read string (line)
     const int MAX_LENGTH = 1024;

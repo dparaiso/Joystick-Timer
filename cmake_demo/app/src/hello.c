@@ -4,8 +4,10 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h> 
+#include <time.h>
 #include "commands.h"
 #include "hal/joystick.h"
+#include "hal/led.h"
 
 
 
@@ -17,23 +19,26 @@ int main()
 
     // initialize
     joystick_init(); 
+    led_init(); 
     long long bestTime = 5000;
 
     while(true){
         printf("Get ready...\n");
-        long long i = 0; 
+        long long flag = 0; 
         while(response() > 0){
-            if(i == 0){
+            if(flag == 0){
                 printf("Please let go of joystick\n");
-                i++;
+                flag++;
             } 
         }
         sleepForMs(randomTime());
         int direction = chooseDirection();
         if(direction){
             printf("Press DOWN now!\n");
+            ledWrite(LED3, "1");
         }else{
             printf("Press UP now!\n");
+            ledWrite(LED0, "1");
         }
         long long startTime = getTimeInMs(); 
         int responseDirection = response(); 
@@ -44,6 +49,8 @@ int main()
                 exit(-1);
             }
         } 
+        ledWrite(LED0, "0");
+        ledWrite(LED3, "0");
         long long endTime = getTimeInMs();      
         long long trialTime = endTime - startTime; 
         if(checkResponse(direction, responseDirection)){
@@ -51,8 +58,46 @@ int main()
                 bestTime = trialTime; 
                 printf("New best time!\n");
             }
+            for(int i = 0; i < 4; i++){
+                long long seconds = 0;
+                long nanoseconds = 75000000;
+                struct timespec reqDelay = {seconds, nanoseconds};
+                nanosleep(&reqDelay, (struct timespec *) NULL);
+                if(i%2){
+                    ledWrite(LED0, "0");
+                    ledWrite(LED1, "0");
+                    ledWrite(LED2, "0");
+                    ledWrite(LED3, "0");
+                }else{
+                    ledWrite(LED0, "1");
+                    ledWrite(LED1, "1");
+                    ledWrite(LED2, "1");
+                    ledWrite(LED3, "1");
+                }
+            }
+            
             printf("Your reaction time was %lldms; best so far in game is %lld\n", trialTime, bestTime);
+        }else{
+            for(int i = 0; i < 20; i++){
+                long long seconds = 0;
+                long nanoseconds = 30000000;
+                struct timespec reqDelay = {seconds, nanoseconds};
+                nanosleep(&reqDelay, (struct timespec *) NULL);
+                if(i%2){
+                    ledWrite(LED0, "0");
+                    ledWrite(LED1, "0");
+                    ledWrite(LED2, "0");
+                    ledWrite(LED3, "0");
+                }else{
+                    ledWrite(LED0, "1");
+                    ledWrite(LED1, "1");
+                    ledWrite(LED2, "1");
+                    ledWrite(LED3, "1");
+                }
+            }
         }
+
+        
     }
 
 
