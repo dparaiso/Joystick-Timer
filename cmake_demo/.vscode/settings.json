@@ -2,6 +2,7 @@
     "C_Cpp.codeAnalysis.clangTidy.enabled": true,
     "files.associations": {
         "button.h": "c",
-        "commands.h": "c"
+        "commands.h": "c",
+        "stdbool.h": "c"
     }
 }

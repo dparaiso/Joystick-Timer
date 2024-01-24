@@ -5,11 +5,8 @@
 #include <time.h>
 #include <stdbool.h> 
 
-// Allow module to ensure it has been initialized (once!)
-static bool is_initialized = false;
 
-int readFromFileToScreen(char* fileName)
-{
+int readFromFileToScreen(char *fileName){
     FILE *pFile = fopen(fileName, "r");
     if (pFile == NULL) {
     printf("ERROR: Unable to open file (%s) for read\n", fileName);
@@ -24,37 +21,60 @@ int readFromFileToScreen(char* fileName)
     return buff[0] - '0';
 }
 
-void button_init(void) 
-{
-    printf("Button - Initializing\n");
-    assert(!is_initialized);
-    is_initialized = true;
+void runCommand(char* command){
+    //Execute shell command (output into pipe)
+    FILE *pipe = popen(command, "r");
 
-    srand(time(0));
-}
-
-bool button_is_button_pressed(void)
-{
-    assert(is_initialized);
-
-    // Read the button state (no, don't just randomly get a value!)
-    bool is_pressed = rand() % 2;
-    return is_pressed;
-
-}
-void button_cleanup(void)
-{
-    // Free any memory, close files, ...
-    printf("Button - Cleanup\n");
-    assert(is_initialized);
-    is_initialized = false;
-}
-
-
-bool responseLeftRight()
-{
-    if(readFromFileToScreen(LEFT) == 0 || readFromFileToScreen(RIGHT) == 0){
-        return true; 
+    //Ignore output of the command; but consume it 
+    //so we don't get an error when closing the pipe 
+    char buffer[1024];
+    while(!feof(pipe) && !ferror(pipe)){
+        if(fgets(buffer, sizeof(buffer), pipe) == NULL)
+        break; 
+        // printf("--> %s", buffer); // uncomment for debugging
     }
+
+    // get the exit code from the pipe; non-zero is an error: 
+    int exitCode =  WEXITSTATUS(pclose(pipe));
+    if (exitCode != 0){
+        perror("Unable to execute command: ");
+        printf("    command: %s\n", command); 
+        printf("    exit code: %d\n", exitCode);
+    }
+
+}
+
+void joystick_init(void) {
+    runCommand(UP);
+    runCommand(DOWN);
+    runCommand(LEFT);
+    runCommand(RIGHT);
+}
+
+
+int response(void){
+    if(!readFromFileToScreen(UP_FILE)){
+        return 1;
+    }else if(!readFromFileToScreen(DOWN_FILE)){
+        return 2;
+    }else if(!readFromFileToScreen(LEFT_FILE)){
+        return 3;
+    }else if(!readFromFileToScreen(RIGHT_FILE)){
+        return 4;
+    }else{
+        return 0;
+    }
+
+}
+
+bool checkResponse(int targetDirection, int chosenDirection){
+    if((targetDirection == 0 && chosenDirection == 1) || (targetDirection == 1 && chosenDirection == 2)){
+        printf("Correct!\n");
+        return true; 
+    }else if(chosenDirection > 2){
+        printf("User selected to quit.\n");
+        exit(-1);
+    }
+    printf("Incorrect.\n");
     return false; 
 }

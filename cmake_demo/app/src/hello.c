@@ -3,55 +3,59 @@
 
 #include <stdio.h>
 #include <stdbool.h>
+#include <stdlib.h> 
 #include "commands.h"
 #include "hal/joystick.h"
 
 
 
-enum direction {left = 1, right = 2, up = 3, down = 4, neutral = 0};
 
 int main()
 {
     printf("Hello embedded world, from Danieva!\nWhen the LEDs light up, press the joystick in that direction!\n");
-    printf("Press left or right to exit\n");
-    printf("Get ready...\n");
-
+    printf("(Press left or right to exit)\n");
 
     // initialize
-    runCommand(LEFT);
-    runCommand(RIGHT);
-    runCommand(UP);
-    runCommand(DOWN);
-    while(true){
-        printf("%d\n", responseLeftRight());
+    joystick_init(); 
+    long long bestTime = 5000;
 
+    while(true){
+        printf("Get ready...\n");
+        long long i = 0; 
+        while(response() > 0){
+            if(i == 0){
+                printf("Please let go of joystick\n");
+                i++;
+            } 
+        }
+        sleepForMs(randomTime());
+        int direction = chooseDirection();
+        if(direction){
+            printf("Press DOWN now!\n");
+        }else{
+            printf("Press UP now!\n");
+        }
+        long long startTime = getTimeInMs(); 
+        int responseDirection = response(); 
+        while(responseDirection == 0){
+            responseDirection = response();
+            if(getTimeInMs()- startTime >= 5000){
+                printf("No input within 5000ms; quitting!\n");
+                exit(-1);
+            }
+        } 
+        long long endTime = getTimeInMs();      
+        long long trialTime = endTime - startTime; 
+        if(checkResponse(direction, responseDirection)){
+            if(trialTime < bestTime){
+                bestTime = trialTime; 
+                printf("New best time!\n");
+            }
+            printf("Your reaction time was %lldms; best so far in game is %lld\n", trialTime, bestTime);
+        }
     }
 
-    // readFromFileToScreen()
 
-    // printf("Hello world!\n");
-
-    // // Initialize all modules; HAL modules first
-    // button_init();
-    // badmath_init();
-
-    // // Main program logic:
-    // for (int i = 0; i < 10; i++) {
-    //     printf("  -> Reading button time %d = %d\n", i, button_is_button_pressed());
-    // }
-
-    // for (int i = 0; i <= 35; i++) {
-    //     int ans = badmath_factorial(i);
-    //     printf("%4d! = %6d\n", i, ans);
-    // }
-
-    // // Cleanup all modules (HAL modules last)
-    // badmath_cleanup();
-    // button_cleanup();
-
-    // printf("!!! DONE !!!\n"); 
-
-    // Some bad code to try out and see what shows up.
     #if 0
         // Test your linting setup
         //   - You should see a warning underline in VS Code
