@@ -1,3 +1,6 @@
+/**
+ * File includes joystick logic, initializing and checking joystick values
+*/
 #include "hal/joystick.h"
 #include <assert.h>
 #include <stdio.h>

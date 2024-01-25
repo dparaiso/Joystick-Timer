@@ -9,9 +9,6 @@
 #include "hal/joystick.h"
 #include "hal/led.h"
 
-
-
-
 int main()
 {
     printf("Hello embedded world, from Danieva!\nWhen the LEDs light up, press the joystick in that direction!\n");
@@ -24,6 +21,8 @@ int main()
 
     while(true){
         printf("Get ready...\n");
+
+        // flag checks for first iteration of the loop to display warning message
         long long flag = 0; 
         while(response() > 0){
             if(flag == 0){
@@ -31,6 +30,7 @@ int main()
                 flag++;
             } 
         }
+
         sleepForMs(randomTime());
         int direction = chooseDirection();
         if(direction){
@@ -40,6 +40,7 @@ int main()
             printf("Press UP now!\n");
             ledWrite(LED0, "1");
         }
+
         long long startTime = getTimeInMs(); 
         int responseDirection = response(); 
         while(responseDirection == 0){
@@ -49,15 +50,20 @@ int main()
                 exit(-1);
             }
         } 
+
         ledWrite(LED0, "0");
         ledWrite(LED3, "0");
+        
         long long endTime = getTimeInMs();      
         long long trialTime = endTime - startTime; 
+        
         if(checkResponse(direction, responseDirection)){
             if(trialTime < bestTime){
                 bestTime = trialTime; 
                 printf("New best time!\n");
             }
+
+            //set off lights 40hz for 1/2 second
             for(int i = 0; i < 4; i++){
                 long long seconds = 0;
                 long nanoseconds = 75000000;
@@ -78,6 +84,8 @@ int main()
             
             printf("Your reaction time was %lldms; best so far in game is %lld\n", trialTime, bestTime);
         }else{
+
+            // set off lights 60Hz for 1 second
             for(int i = 0; i < 20; i++){
                 long long seconds = 0;
                 long nanoseconds = 30000000;
@@ -100,21 +108,4 @@ int main()
         
     }
 
-
-    #if 0
-        // Test your linting setup
-        //   - You should see a warning underline in VS Code
-        //   - You should see compile-time errors when building (-Wall -Werror)
-        // (Linting using clang-tidy; see )
-        int x = 0;
-        if (x = 10) {
-        }
-    #endif
-    #if 0
-        // Demonstrate -fsanitize=address (enabled in the root CMakeFiles.txt)
-        // Compile and run this code. Should see warning at compile time; error at runtime.
-        int data[3];
-        data[3] = 10;
-        printf("Value: %d\n", data[3]);
-    #endif
 }

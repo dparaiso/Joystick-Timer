@@ -18,7 +18,6 @@
 
 int readFromFileToScreen(char *fileName);
 void joystick_init(void);
-void button_cleanup(void);
 int response(void);
 bool checkResponse(int targetDirection, int chosenDirection);
 

@@ -1,3 +1,7 @@
+/**
+ * File contains functions used in main for time, and randomized choices (time and direction)
+*/
+
 #include "commands.h"
 #include <stdio.h> 
 #include <time.h> 

@@ -1,3 +1,6 @@
+/**
+ * File includes led logic, initializing and checking joystick values
+*/
 #include "hal/led.h"
 #include <stdio.h>
 #include <stdlib.h>
